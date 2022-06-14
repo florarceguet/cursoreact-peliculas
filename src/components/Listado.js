@@ -1,6 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+
+import { Editar } from './Editar';
 
 export const Listado = ({ listadoState, setListadoState }) => {
+  const [editar, setEditar] = useState(0);
   useEffect(() => {
     conseguirPeliculas();
   }, []);
@@ -8,12 +11,12 @@ export const Listado = ({ listadoState, setListadoState }) => {
   const conseguirPeliculas = () => {
     let peliculas = JSON.parse(localStorage.getItem('Peliculas'));
     setListadoState(peliculas);
+    return peliculas;
   };
 
   const eliminarPeli = (e, id) => {
     let peliculas = JSON.parse(localStorage.getItem('Peliculas'));
     let nuevo_array_peliculas = peliculas.filter((x) => x.id !== id);
-    console.log(nuevo_array_peliculas);
     setListadoState(nuevo_array_peliculas);
     localStorage.setItem('Peliculas', JSON.stringify(nuevo_array_peliculas));
   };
@@ -29,10 +32,26 @@ export const Listado = ({ listadoState, setListadoState }) => {
               <article className="peli-item" key={pelicula.id}>
                 <h3 className="title">{pelicula.titulo}</h3>
                 <p className="description">{pelicula.descripcion}</p>
-                <button className="edit">Editar</button>
+                <button
+                  className="edit"
+                  onClick={() => {
+                    setEditar(pelicula.id);
+                  }}
+                >
+                  Editar
+                </button>
                 <button className="delete" onClick={(e) => eliminarPeli(e, pelicula.id)}>
                   Borrar
                 </button>
+
+                {editar === pelicula.id && (
+                  <Editar
+                    pelicula={listadoState.find((x) => x.id === pelicula.id)}
+                    conseguirPeliculas={conseguirPeliculas}
+                    setEditar={setEditar}
+                    setListadoState={setListadoState}
+                  ></Editar>
+                )}
               </article>
             );
           })
